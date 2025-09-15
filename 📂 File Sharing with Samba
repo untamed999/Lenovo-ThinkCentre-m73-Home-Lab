@@ -1,0 +1,44 @@
+📂 File Sharing with Samba
+
+Set up Samba for network file sharing across devices.
+
+Installation
+sudo apt install samba -y
+
+Configuration
+
+Edit Samba config:
+
+sudo nano /etc/samba/smb.conf
+
+
+Add this share:
+
+[SharedFiles]
+   path = /srv/shared
+   browsable = yes
+   writable = yes
+   guest ok = no
+   read only = no
+
+
+Create shared folder and set permissions:
+
+sudo mkdir -p /srv/shared
+sudo chown -R $USER:$USER /srv/shared
+
+
+Add a Samba user:
+
+sudo smbpasswd -a $USER
+
+
+Restart Samba:
+
+sudo systemctl restart smbd
+
+Access
+
+From Windows: \\<server-ip>\SharedFiles
+
+From Linux: smb://<server-ip>/SharedFiles
