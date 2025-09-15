@@ -1,0 +1,121 @@
+Got it 👍 — since you have a **500GB HDD** and a **32GB SSD** (your OS disk), mounting additional disks on Ubuntu is straightforward. Here’s a clear step-by-step guide:
+
+---
+
+## 1️⃣ Identify your disks
+
+Run:
+
+```bash
+lsblk
+```
+
+Output example:
+
+```
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda      8:0    0   32G  0 disk
+sdb      8:16   0  500G  0 disk
+```
+
+* `sda` → SSD (OS disk)
+* `sdb` → HDD (data/storage disk)
+
+---
+
+## 2️⃣ Partition the disk (if needed)
+
+If the disk is empty, create a partition:
+
+```bash
+sudo fdisk /dev/sdb
+```
+
+Inside `fdisk`:
+
+1. Press `n` → new partition
+2. Press `p` → primary
+3. Accept default for first and last sector (use full disk)
+4. Press `w` → write changes
+
+Check partition:
+
+```bash
+lsblk
+# You should see /dev/sdb1
+```
+
+---
+
+## 3️⃣ Format the partition
+
+Most common: **ext4** (Linux-friendly):
+
+```bash
+sudo mkfs.ext4 /dev/sdb1
+```
+
+---
+
+## 4️⃣ Create a mount point
+
+Decide where you want to mount the disk, e.g. `/mnt/data`:
+
+```bash
+sudo mkdir -p /mnt/data
+```
+
+---
+
+## 5️⃣ Mount the disk temporarily
+
+```bash
+sudo mount /dev/sdb1 /mnt/data
+```
+
+* Now you can access the disk at `/mnt/data`.
+
+---
+
+## 6️⃣ Mount the disk automatically at boot
+
+Edit `/etc/fstab`:
+
+```bash
+sudo nano /etc/fstab
+```
+
+Add this line at the bottom:
+
+```
+/dev/sdb1  /mnt/data  ext4  defaults  0  2
+```
+
+* Save and exit.
+
+Test:
+
+```bash
+sudo umount /mnt/data
+sudo mount -a
+```
+
+* If no errors → disk mounts automatically on boot.
+
+---
+
+## 7️⃣ Optional: Set permissions
+
+If you want your user to own it:
+
+```bash
+sudo chown -R $USER:$USER /mnt/data
+```
+
+---
+
+⚡ Now your HDD is ready for **Samba shares, VM storage, backups, or any data**.
+
+---
+
+
