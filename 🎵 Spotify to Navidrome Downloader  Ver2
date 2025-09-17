@@ -1,0 +1,102 @@
+
+# 🎵 Spotify to Navidrome Downloader  
+
+## 📖 Overview  
+This project sets up **Navidrome** as a personal music streaming server and includes a **Python script** to download and organize music from Spotify playlists/albums (via YouTube using `yt-dlp`).  
+
+It automatically places music in the Navidrome library so you can stream it anywhere.  
+
+---
+
+## ⚡ Features  
+- 🛠️ Self-hosted **Navidrome** music server  
+- 📥 Download Spotify playlists/albums via **yt-dlp**  
+- 🎶 Organizes songs into `Artist/Album/Track.mp3`  
+- 🔄 Works directly with your Navidrome music folder  
+
+---
+
+## 📂 Project Structure  
+```
+
+.
+├── spotify\_downloader.py   # Script to download songs
+├── README.md               # Project documentation
+└── docker-compose.yml      # (Optional) Navidrome Docker setup
+
+````
+
+---
+
+## 🚀 Installation  
+
+1. **Install dependencies**  
+   ```bash
+   sudo apt update && sudo apt install -y python3 python3-pip
+   pip install yt-dlp
+````
+
+2. **Clone this repo**
+
+   ```bash
+   git clone https://github.com/untamed999/navidrome-spotify-downloader.git
+   cd navidrome-spotify-downloader
+   ```
+
+3. **Configure Navidrome**
+   Edit `/etc/navidrome/navidrome.toml` and set your music folder:
+
+   ```toml
+   MusicFolder = "/media/hdd/Music/SpotifyDownloads"
+   ```
+
+4. **(Optional) Run Navidrome via Docker**
+
+   ```bash
+   docker-compose up -d
+   ```
+
+---
+
+## ▶️ Usage
+
+Run the script and paste a Spotify or YouTube link:
+
+```bash
+python3 spotify_downloader.py
+```
+
+Example:
+
+```
+Enter URL: https://open.spotify.com/track/abc123
+```
+
+The script will:
+✅ Find the YouTube version
+✅ Download it as MP3
+✅ Save it into the Navidrome music folder
+
+---
+
+## 📸 Screenshots
+
+(Add screenshots of your Navidrome UI here)
+
+---
+
+## 💡 Notes
+
+* Spotify doesn’t allow direct downloads. This script **fetches audio via YouTube**.
+* Extendable to handle playlists, albums, or bulk downloads.
+
+---
+
+## 📜 License
+
+MIT License – Free to use, modify, and share.
+
+```
+
+---
+
