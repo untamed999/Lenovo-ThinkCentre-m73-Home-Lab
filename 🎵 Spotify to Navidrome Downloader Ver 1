@@ -1,0 +1,127 @@
+
+# 🎶 Spotify Music Downloader + Navidrome Streaming Server
+
+## 📌 Overview
+
+This project automates downloading music from **Spotify playlists**, organizing them into folders by **Artist → Album → Track**, and serving them via **Navidrome**, a personal music streaming server.
+With this setup, I can download my Spotify playlists and stream them on my phone or any device, anywhere.
+
+---
+
+## ⚙️ Features
+
+* ✅ **Spotify playlist downloader**
+
+  * Uses `spotipy` (Spotify API) and `yt-dlp` (YouTube as source)
+  * Downloads songs as `.mp3` files
+  * Saves cover art for each track
+  * Organizes music into:
+
+    ```
+    Music/SpotifyDownloads/Artist/Album/Song.mp3
+    ```
+* ✅ **Navidrome streaming server**
+
+  * Self-hosted Subsonic-compatible server
+  * Streams to web, iOS, Android (apps like [Symfonium](https://symfonium.app/) or [Substreamer](https://substreamerapp.com/))
+  * Auto-detects newly downloaded music
+  * Stores metadata, playlists, and cover art
+
+---
+
+## 🛠️ Setup Steps
+
+### 1. Install dependencies
+
+```bash
+sudo apt update && sudo apt install -y python3-pip ffmpeg docker.io
+pip install spotipy yt-dlp
+```
+
+### 2. Spotify Downloader Script
+
+Save as `spotify_downloader_by_playlist.py`:
+
+```python
+import os, spotipy
+from spotipy.oauth2 import SpotifyOAuth
+import subprocess
+
+# Spotify credentials
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+    client_id="YOUR_CLIENT_ID",
+    client_secret="YOUR_CLIENT_SECRET",
+    redirect_uri="http://localhost:8888/callback",
+    scope="playlist-read-private"
+))
+
+DOWNLOAD_DIR = "/media/hdd/Music/SpotifyDownloads"
+
+def download_track(artist, album, title):
+    artist_dir = os.path.join(DOWNLOAD_DIR, artist, album)
+    os.makedirs(artist_dir, exist_ok=True)
+    search = f"{artist} - {title}"
+    subprocess.run([
+        "yt-dlp", "--extract-audio", "--audio-format", "mp3",
+        "-o", f"{artist_dir}/%(title)s.%(ext)s", f"ytsearch1:{search}"
+    ])
+
+playlist_url = "YOUR_SPOTIFY_PLAYLIST_URL"
+playlist = sp.playlist_tracks(playlist_url)
+
+for item in playlist["items"]:
+    track = item["track"]
+    artist = track["artists"][0]["name"]
+    album = track["album"]["name"]
+    title = track["name"]
+    print(f"Downloading: {artist} - {title}")
+    download_track(artist, album, title)
+```
+
+Run it:
+
+```bash
+python spotify_downloader_by_playlist.py
+```
+
+---
+
+### 3. Install Navidrome with Docker
+
+```bash
+mkdir -p /docker/navidrome/data
+docker run -d \
+  --name=navidrome \
+  --restart=unless-stopped \
+  -p 4533:4533 \
+  -v /docker/navidrome/data:/data \
+  -v /media/hdd/Music/SpotifyDownloads:/music \
+  deluan/navidrome:latest
+```
+
+Access Navidrome:
+👉 [http://localhost:4533](http://localhost:4533) or `http://your-server-ip:4533`
+
+---
+
+## 📱 Usage
+
+1. Add Spotify playlist URL to the script
+2. Run script → downloads music into `/media/hdd/Music/SpotifyDownloads`
+3. Navidrome automatically scans this folder
+4. Stream music via Navidrome web app or mobile apps
+
+---
+
+## 🚀 Future Improvements
+
+* Add **cron job** for automatic daily sync
+* Add metadata tagging (artist, album, genre)
+* Better error handling for missing/blocked YouTube tracks
+
+---
+
+✅ **Result**: I now have a full workflow to **download Spotify playlists** → **organize them** → **stream them anywhere** with Navidrome.
+
+---
+
